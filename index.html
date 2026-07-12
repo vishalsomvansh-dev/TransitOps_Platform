@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitOps - Smart Transport Operation Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <section id="loginPage" class="auth-page active">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>🚌 TransitOps</h1>
+                    <p>Smart Transport Operation Platform</p>
+                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                    <div class="form-group checkbox">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <button type="submit" class="btn-login">Login</button>
+                    <button type="button" class="btn-admin" onclick="switchToAdminLogin()">Admin Login</button>
+                </form>
+                <div class="demo-credentials">
+                    <p><strong>Demo User:</strong> user@transitops.com / password123</p>
+                    <p><strong>Demo Admin:</strong> admin@transitops.com / admin123</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Login Page -->
+    <section id="adminLoginPage" class="auth-page">
+        <div class="login-container">
+            <div class="login-card admin-login">
+                <div class="login-header">
+                    <h1>🔐 Admin Login</h1>
+                    <p>Administrator Dashboard Access</p>
+                </div>
+                <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label for="adminEmail">Admin Email</label>
+                        <input type="email" id="adminEmail" required placeholder="Enter admin email">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password</label>
+                        <input type="password" id="adminPassword" required placeholder="Enter password">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminKey">Admin Key</label>
+                        <input type="password" id="adminKey" required placeholder="Enter admin key">
+                    </div>
+                    <button type="submit" class="btn-login">Admin Login</button>
+                    <button type="button" class="btn-back" onclick="switchToUserLogin()">Back to User Login</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar" style="display:none;">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>🚌 TransitOps</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+                <li><a href="#" class="nav-link" data-page="vehicles">Vehicles</a></li>
+                <li><a href="#" class="nav-link" data-page="drivers">Drivers</a></li>
+                <li><a href="#" class="nav-link" data-page="trips">Trips</a></li>
+                <li><a href="#" class="nav-link" data-page="maintenance">Maintenance</a></li>
+                <li><a href="#" class="nav-link" data-page="fuelLogs">Fuel Logs</a></li>
+                <li><a href="#" class="nav-link" data-page="expenses">Expenses</a></li>
+                <li><a href="#" class="nav-link" data-page="reports">Reports</a></li>
+                <li><a href="#" class="nav-link" data-page="settings">Settings</a></li>
+                <li><a href="#" class="nav-link logout-btn" onclick="handleLogout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" style="display:none;">
+        <!-- Dashboard Page -->
+        <section id="dashboard" class="page active">
+            <div class="container">
+                <h2>Dashboard - Real-time Fleet Status</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Total Vehicles</h3>
+                        <p class="metric-value" id="totalVehicles">0</p>
+                        <p class="metric-label">In fleet</p>
+                    </div>
+                    <div class="metric-card active">
+                        <h3>Active Vehicles</h3>
+                        <p class="metric-value" id="activeVehicles">0</p>
+                        <p class="metric-label">Currently operating</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Active Trips</h3>
+                        <p class="metric-value" id="activeTrips">0</p>
+                        <p class="metric-label">In progress</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Total Drivers</h3>
+                        <p class="metric-value" id="totalDrivers">0</p>
+                        <p class="metric-label">On staff</p>
+                    </div>
+                </div>
+                <div class="quick-stats">
+                    <h3>Quick Statistics</h3>
+                    <ul>
+                        <li>Total Revenue Today: <strong id="revenueStat">₹0</strong></li>
+                        <li>Total Fuel Cost: <strong id="fuelStat">₹0</strong></li>
+                        <li>Total Expenses: <strong id="expenseStat">₹0</strong></li>
+                        <li>Vehicles in Maintenance: <strong id="maintenanceStat">0</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vehicles Page -->
+        <section id="vehicles" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Vehicle Management</h2>
+                    <button class="btn-add" onclick="showAddVehicleForm()">+ Add Vehicle</button>
+                </div>
+                <div class="filter-group">
+                    <select id="vehicleStatusFilter" class="filter-select" onchange="filterVehicles()">
+                        <option value="">All Vehicles</option>
+                        <option value="active">Active</option>
+                        <option value="idle">Idle</option>
+                        <option value="maintenance">Maintenance</option>
+                    </select>
+                    <input type="text" id="vehicleSearch" placeholder="Search by plate number..." class="search-input" onkeyup="filterVehicles()">
+                </div>
+                <div class="vehicles-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Plate Number</th>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Status</th>
+                                <th>Driver</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehiclesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Vehicle Form -->
+        <section id="addVehicle" class="page">
+            <div class="container">
+                <h2>Add New Vehicle</h2>
+                <form id="addVehicleForm" class="data-form" onsubmit="submitAddVehicle(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehiclePlate">Plate Number *</label>
+                            <input type="text" id="vehiclePlate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleType">Vehicle Type *</label>
+                            <select id="vehicleType" required>
+                                <option>Bus</option>
+                                <option>Minibus</option>
+                                <option>Van</option>
+                                <option>Taxi</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleModel">Model *</label>
+                            <input type="text" id="vehicleModel" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleYear">Year *</label>
+                            <input type="number" id="vehicleYear" required min="2000" max="2030">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleCapacity">Capacity (Seats) *</label>
+                            <input type="number" id="vehicleCapacity" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleReg">Registration Number *</label>
+                            <input type="text" id="vehicleReg" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Add Vehicle</button>
+                        <button type="button" class="btn-cancel" onclick="navigateToPage('vehicles')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Drivers Page -->
+        <section id="drivers" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Driver Management</h2>
+                    <button class="btn-add" onclick="showAddDriverForm()">+ Add Driver</button>
+                </div>
+                <div class="filter-group">
+                    <select id="driverStatusFilter" class="filter-select" onchange="filterDrivers()">
+                        <option value="">All Drivers</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <input type="text" id="driverSearch" placeholder="Search by name or license..." class="search-input" onkeyup="filterDrivers()">
+                </div>
+                <div class="drivers-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>License Number</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Current Vehicle</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="driversTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Driver Form -->
+        <section id="addDriver" class="page">
+            <div class="container">
+                <h2>Add New Driver</h2>
+                <form id="addDriverForm" class="data-form" onsubmit="submitAddDriver(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="driverName">Full Name *</label>
+                            <input type="text" id="driverName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="driverPhone">Phone Number *</label>
+                            <input type="tel" id="driverPhone" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="driverLicense">License Number *</label>
+                            <input type="text" id="driverLicense" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="driverLicenseExp">License Expiry *</label>
+                            <input type="date" id="driverLicenseExp" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="driverEmail">Email</label>
+                            <input type="email" id="driverEmail">
+                        </div>
+                        <div class="form-group">
+                            <label for="driverAddress">Address</label>
+                            <input type="text" id="driverAddress">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Add Driver</button>
+                        <button type="button" class="btn-cancel" onclick="navigateToPage('drivers')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Trips Page -->
+        <section id="trips" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Trip Management</h2>
+                    <button class="btn-add" onclick="showCreateTripForm()">+ Create Trip</button>
+                </div>
+                <div class="filter-group">
+                    <select id="tripStatusFilter" class="filter-select" onchange="filterTrips()">
+                        <option value="">All Trips</option>
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="trips-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Trip ID</th>
+                                <th>Vehicle</th>
+                                <th>Driver</th>
+                                <th>From - To</th>
+                                <th>Status</th>
+                                <th>Revenue</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tripsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Create Trip Form -->
+        <section id="createTrip" class="page">
+            <div class="container">
+                <h2>Create New Trip</h2>
+                <form id="createTripForm" class="data-form" onsubmit="submitCreateTrip(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tripVehicle">Select Vehicle *</label>
+                            <select id="tripVehicle" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tripDriver">Select Driver *</label>
+                            <select id="tripDriver" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tripFrom">From Location *</label>
+                            <input type="text" id="tripFrom" required placeholder="Starting point">
+                        </div>
+                        <div class="form-group">
+                            <label for="tripTo">To Location *</label>
+                            <input type="text" id="tripTo" required placeholder="Destination">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tripDate">Date *</label>
+                            <input type="date" id="tripDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tripTime">Time *</label>
+                            <input type="time" id="tripTime" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tripPassengers">Passengers *</label>
+                            <input type="number" id="tripPassengers" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="tripRevenue">Revenue (₹) *</label>
+                            <input type="number" id="tripRevenue" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Create Trip</button>
+                        <button type="button" class="btn-cancel" onclick="navigateToPage('trips')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Maintenance Page -->
+        <section id="maintenance" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Maintenance Records</h2>
+                    <button class="btn-add" onclick="showAddMaintenanceForm()">+ Add Maintenance</button>
+                </div>
+                <div class="filter-group">
+                    <select id="maintenanceStatusFilter" class="filter-select" onchange="filterMaintenance()">
+                        <option value="">All Records</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="maintenance-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Cost</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenanceTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Maintenance Form -->
+        <section id="addMaintenance" class="page">
+            <div class="container">
+                <h2>Add Maintenance Record</h2>
+                <form id="addMaintenanceForm" class="data-form" onsubmit="submitAddMaintenance(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maintenanceVehicle">Vehicle *</label>
+                            <select id="maintenanceVehicle" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="maintenanceType">Type *</label>
+                            <select id="maintenanceType" required>
+                                <option>Regular Service</option>
+                                <option>Oil Change</option>
+                                <option>Tire Replacement</option>
+                                <option>Engine Repair</option>
+                                <option>Brake Service</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maintenanceDate">Date *</label>
+                            <input type="date" id="maintenanceDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maintenanceCost">Cost (₹) *</label>
+                            <input type="number" id="maintenanceCost" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="maintenanceNotes">Notes</label>
+                        <textarea id="maintenanceNotes" rows="4"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Add Maintenance</button>
+                        <button type="button" class="btn-cancel" onclick="navigateToPage('maintenance')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Fuel Logs Page -->
+        <section id="fuelLogs" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Fuel Logs</h2>
+                    <button class="btn-add" onclick="showAddFuelLogForm()">+ Add Fuel Log</button>
+                </div>
+                <div class="fuel-logs-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Date</th>
+                                <th>Liters</th>
+                                <th>Cost (₹)</th>
+                                <th>Mileage</th>
+                                <th>Efficiency</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fuelLogsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Fuel Log Form -->
+        <section id="addFuelLog" class="page">
+            <div class="container">
+                <h2>Add Fuel Log</h2>
+                <form id="addFuelLogForm" class="data-form" onsubmit="submitAddFuelLog(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fuelVehicle">Vehicle *</label>
+                            <select id="fuelVehicle" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fuelDate">Date *</label>
+                            <input type="date" id="fuelDate" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fuelLiters">Liters *</label>
+                            <input type="number" id="fuelLiters" required min="0.1" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="fuelCost">Cost (₹) *</label>
+                            <input type="number" id="fuelCost" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fuelMileage">Mileage (km) *</label>
+                            <input type="number" id="fuelMileage" required min="0">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Add Fuel Log</button>
+                        <button type="button" class="btn-cancel" onclick="navigateToPage('fuelLogs')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Expenses Page -->
+        <section id="expenses" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Expenses</h2>
+                    <button class="btn-add" onclick="showAddExpenseForm()">+ Add Expense</button>
+                </div>
+                <div class="filter-group">
+                    <select id="expenseCategoryFilter" class="filter-select" onchange="filterExpenses()">
+                        <option value="">All Categories</option>
+                        <option value="fuel">Fuel</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="salary">Salary</option>
+                        <option value="tolls">Tolls</option>
+                        <option value="parking">Parking</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="expenses-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount (₹)</th>
+                                <th>Vehicle</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Expense Form -->
+        <section id="addExpense" class="page">
+            <div class="container">
+                <h2>Add Expense</h2>
+                <form id="addExpenseForm" class="data-form" onsubmit="submitAddExpense(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseDate">Date *</label>
+                            <input type="date" id="expenseDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseCategory">Category *</label>
+                            <select id="expenseCategory" required>
+                                <option>Fuel</option>
+                                <option>Maintenance</option>
+                                <option>Insurance</option>
+                                <option>Salary</option>
+                                <option>Tolls</option>
+                                <option>Parking</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseDescription">Description *</label>
+                            <input type="text" id="expenseDescription" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseAmount">Amount (₹) *</label>
+                            <input type="number" id="expenseAmount" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseVehicle">Vehicle (Optional)</label>
+                            <select id="expenseVehicle"></select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Add Expense</button>
+                        <button type="button" class="btn-cancel" onclick="navigateToPage('expenses')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Reports Page -->
+        <section id="reports" class="page">
+            <div class="container">
+                <h2>Reports</h2>
+                <div class="reports-grid">
+                    <div class="report-card" onclick="generateFleetReport()">
+                        <h3>Fleet Report</h3>
+                        <p>Vehicle utilization and status</p>
+                        <span class="report-icon">📊</span>
+                    </div>
+                    <div class="report-card" onclick="generateRevenueReport()">
+                        <h3>Revenue Report</h3>
+                        <p>Daily and monthly revenue analysis</p>
+                        <span class="report-icon">💰</span>
+                    </div>
+                    <div class="report-card" onclick="generateExpenseReport()">
+                        <h3>Expense Report</h3>
+                        <p>Cost breakdown by category</p>
+                        <span class="report-icon">💸</span>
+                    </div>
+                    <div class="report-card" onclick="generateDriverReport()">
+                        <h3>Driver Report</h3>
+                        <p>Driver performance and statistics</p>
+                        <span class="report-icon">👨‍✈️</span>
+                    </div>
+                    <div class="report-card" onclick="generateMaintenanceReport()">
+                        <h3>Maintenance Report</h3>
+                        <p>Maintenance history and schedules</p>
+                        <span class="report-icon">🔧</span>
+                    </div>
+                    <div class="report-card" onclick="generateFuelReport()">
+                        <h3>Fuel Report</h3>
+                        <p>Fuel consumption and efficiency</p>
+                        <span class="report-icon">⛽</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Page -->
+        <section id="settings" class="page">
+            <div class="container">
+                <h2>Settings</h2>
+                <div class="settings-grid">
+                    <div class="settings-section">
+                        <h3>Account Settings</h3>
+                        <div class="settings-item">
+                            <label>Full Name</label>
+                            <input type="text" id="settingsName" value="Administrator">
+                        </div>
+                        <div class="settings-item">
+                            <label>Email</label>
+                            <input type="email" id="settingsEmail" value="admin@transitops.com">
+                        </div>
+                        <div class="settings-item">
+                            <label>Phone</label>
+                            <input type="tel" id="settingsPhone" value="+91 9876543210">
+                        </div>
+                        <button class="btn" onclick="saveAccountSettings()">Save Changes</button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Company Settings</h3>
+                        <div class="settings-item">
+                            <label>Company Name</label>
+                            <input type="text" id="settingsCompany" value="TransitOps Inc">
+                        </div>
+                        <div class="settings-item">
+                            <label>Company Email</label>
+                            <input type="email" id="settingsCompanyEmail" value="info@transitops.com">
+                        </div>
+                        <div class="settings-item">
+                            <label>Currency</label>
+                            <select id="settingsCurrency">
+                                <option selected>INR (₹)</option>
+                                <option>USD ($)</option>
+                                <option>EUR (€)</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="saveCompanySettings()">Save Changes</button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Notification Settings</h3>
+                        <div class="settings-item checkbox">
+                            <input type="checkbox" id="notifyTrips" checked>
+                            <label for="notifyTrips">Trip Notifications</label>
+                        </div>
+                        <div class="settings-item checkbox">
+                            <input type="checkbox" id="notifyMaintenance" checked>
+                            <label for="notifyMaintenance">Maintenance Alerts</label>
+                        </div>
+                        <div class="settings-item checkbox">
+                            <input type="checkbox" id="notifyExpenses" checked>
+                            <label for="notifyExpenses">Expense Updates</label>
+                        </div>
+                        <button class="btn" onclick="saveNotificationSettings()">Save Changes</button>
+                    </div>
+
+                    <div class="settings-section danger">
+                        <h3>Change Password</h3>
+                        <div class="settings-item">
+                            <label>Current Password</label>
+                            <input type="password" id="currentPassword">
+                        </div>
+                        <div class="settings-item">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword">
+                        </div>
+                        <div class="settings-item">
+                            <label>Confirm Password</label>
+                            <input type="password" id="confirmPassword">
+                        </div>
+                        <button class="btn" onclick="changePassword()">Update Password</button>
+                    </div>
+
+                    <div class="settings-section danger">
+                        <h3>Danger Zone</h3>
+                        <p>Be careful with these options</p>
+                        <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
+                        <button class="btn-danger" onclick="handleLogout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/vehicles.js"></script>
+    <script src="js/drivers.js"></script>
+    <script src="js/trips.js"></script>
+    <script src="js/maintenance.js"></script>
+    <script src="js/fuelLogs.js"></script>
+    <script src="js/expenses.js"></script>
+    <script src="js/reports.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>
