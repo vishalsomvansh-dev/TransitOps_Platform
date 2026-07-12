@@ -1,0 +1,237 @@
+/* GPS Tracking Styles */
+
+.tracking-controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.tracking-container {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.map-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.gps-map {
+    width: 100%;
+    height: 500px;
+    background: #e8f4f8;
+    position: relative;
+}
+
+.map-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.vehicle-marker {
+    transition: all 0.3s ease;
+}
+
+.vehicle-marker:hover circle {
+    r: 16px;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+}
+
+.tracking-list {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.tracking-list h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 1rem;
+}
+
+.vehicle-tracking-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.vehicle-tracking-item {
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.vehicle-tracking-item:hover {
+    border-color: #667eea;
+    background: #f5f5f5;
+}
+
+.vehicle-tracking-item.active {
+    border-color: #667eea;
+    background: #f0f4ff;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.vehicle-tracking-item.status-active {
+    border-left: 4px solid #4CAF50;
+}
+
+.vehicle-tracking-item.status-idle {
+    border-left: 4px solid #FFC107;
+}
+
+.vehicle-tracking-item.status-maintenance {
+    border-left: 4px solid #FF5722;
+}
+
+.tracking-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tracking-item-header strong {
+    flex: 1;
+    color: #333;
+}
+
+.vehicle-icon {
+    font-size: 1.2rem;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    color: white;
+}
+
+.status-badge.status-active {
+    background: #4CAF50;
+}
+
+.status-badge.status-idle {
+    background: #FFC107;
+    color: #333;
+}
+
+.status-badge.status-maintenance {
+    background: #FF5722;
+}
+
+.tracking-item-details {
+    margin-top: 0.5rem;
+}
+
+.tracking-item-details p {
+    margin: 0.25rem 0;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.tracking-details {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.tracking-details h3 {
+    color: #333;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 4px solid #667eea;
+}
+
+.detail-item label {
+    display: block;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.detail-item span {
+    display: block;
+    color: #333;
+    font-size: 1rem;
+    word-break: break-all;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .tracking-container {
+        grid-template-columns: 1fr;
+    }
+
+    .tracking-list {
+        max-height: 400px;
+    }
+
+    .gps-map {
+        height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .tracking-controls {
+        flex-direction: column;
+    }
+
+    .details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gps-map {
+        height: 300px;
+    }
+
+    .tracking-list {
+        max-height: 300px;
+    }
+}
+
+/* Scrollbar Styling */
+.tracking-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tracking-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.tracking-list::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+.tracking-list::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
